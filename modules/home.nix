@@ -1,4 +1,4 @@
-import ./module.nix (
+import ./common.nix (
   { name, serviceConfig, pathConfig }:
   {
     systemd.user.services.${name} = {

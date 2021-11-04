@@ -126,8 +126,8 @@
       # SYSTEM-INDEPENDENT OUTPUTS
       #
       {
-        nixosModules."${name}-nixos" = import ./modules/vscode-server/default.nix;
-        nixosModules."${name}-home" = import ./modules/vscode-server/home.nix;
+        nixosModules."${name}-nixos" = import ./modules/nixos.nix;
+        nixosModules."${name}-home" = import ./modules/home.nix;
       }
     ];
 }
