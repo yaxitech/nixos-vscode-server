@@ -44,12 +44,12 @@ in
     pathConfig = {
       Description = "Watch for changes in directories created by the VS Code remote SSH extension";
       PathChanged = cfg.watchDirs;
-      Unit = "${svcName}.service";
+      Unit = "${name}.service";
     };
     serviceConfig = {
       Description = "Fix binaries uploaded by the VS Code server remote SSH extension";
       Type = "oneshot";
-      ExecStart = "${pkgs.writeShellScript "${svcName}.sh" ''
+      ExecStart = "${pkgs.writeShellScript "${name}.sh" ''
         set -euo pipefail
         
         watch_dirs=( ${concatMapStringsSep " " (x: escapeShellArg x) cfg.watchDirs} )
