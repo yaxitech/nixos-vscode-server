@@ -63,8 +63,8 @@
           };
           pythonTest = import (nixpkgs + "/nixos/lib/testing-python.nix") { inherit system pkgs; };
 
-          systemdUnitPathSystem = "/etc/systemd/user/auto-fix-vscode-server.service";
-          systemdUnitPathHome = "~/.config/systemd/user/auto-fix-vscode-server.service";
+          systemdUnitPathSystem = "/etc/systemd/user/vscode-server-fixup.service";
+          systemdUnitPathHome = "$HOME/.config/systemd/user/auto-fix-vscode-server.service";
         in
         {
           # Test for the NixOS module
@@ -76,7 +76,7 @@
                 self.nixosModules."${name}-nixos"
               ];
 
-              services.vscode-server.enable = true;
+              services.vscode-server-fixup.enable = true;
             };
 
             testScript = ''
@@ -126,7 +126,7 @@
       # SYSTEM-INDEPENDENT OUTPUTS
       #
       {
-        nixosModules."${name}-nixos" = import ./modules/vscode-server;
+        nixosModules."${name}-nixos" = import ./module.nix;
         nixosModules."${name}-home" = import ./modules/vscode-server/home.nix;
       }
     ];
