@@ -64,7 +64,7 @@
           pythonTest = import (nixpkgs + "/nixos/lib/testing-python.nix") { inherit system pkgs; };
 
           systemdUnitPathSystem = "/etc/systemd/user/vscode-server-fixup.service";
-          systemdUnitPathHome = "$HOME/.config/systemd/user/auto-fix-vscode-server.service";
+          systemdUnitPathHome = "$HOME/.config/systemd/user/vscode-server-fixup.service";
         in
         {
           # Test for the NixOS module
@@ -104,7 +104,7 @@
                   self.nixosModules."${name}-home"
                 ];
                 home-manager.users.root = { ... }: {
-                  services.vscode-server.enable = true;
+                  services.vscode-server-fixup.enable = true;
                 };
               }
             ];
@@ -126,7 +126,7 @@
       # SYSTEM-INDEPENDENT OUTPUTS
       #
       {
-        nixosModules."${name}-nixos" = import ./module.nix;
+        nixosModules."${name}-nixos" = import ./modules/vscode-server/default.nix;
         nixosModules."${name}-home" = import ./modules/vscode-server/home.nix;
       }
     ];

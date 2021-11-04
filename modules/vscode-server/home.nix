@@ -1,15 +1,15 @@
-import ./module.nix ({ name, description, serviceConfig }:
-
+import ./module.nix (
+  { name, serviceConfig, pathConfig }:
   {
     systemd.user.services.${name} = {
-      Unit = {
-        Description = description;
-      };
-
+      Unit.Description = serviceConfig.Description;
       Service = serviceConfig;
-
-      Install = {
-        WantedBy = [ "default.target" ];
-      };
     };
-  })
+
+    systemd.user.paths.${name} = {
+      Unit.Description = pathConfig.Description;
+      Path = pathConfig;
+      Install.WantedBy = [ "default.target" ];
+    };
+  }
+)
