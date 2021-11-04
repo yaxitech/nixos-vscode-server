@@ -1,0 +1,30 @@
+name: CI
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+jobs:
+  check:
+    name: 'Check'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Nix
+        uses: cachix/install-nix-action@v14.1
+        with:
+          install_url: https://nixos-nix-install-tests.cachix.org/serve/vij683ly7sl95nnhb67bdjjfabclr85m/install
+          install_options: '--tarball-url-prefix https://nixos-nix-install-tests.cachix.org/serve'
+          extra_nix_config: |
+            experimental-features = nix-command flakes recursive-nix
+            system-features = nixos-test benchmark big-parallel kvm recursive-nix
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+      - name: Setup Cachix
+        uses: cachix/cachix-action@v10
+        with:
+          name: wurzelpfropf
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN_PUBLIC }}'
+      - name: 'Run checks'
+        run: nix flake check -L .
