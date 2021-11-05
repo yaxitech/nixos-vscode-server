@@ -30,11 +30,13 @@ in
     watchDirs = mkOption {
       type = types.listOf types.str;
       description = ''
-        List of directory paths to watch to apply automatic fixes.
+        List of absolute directory paths to watch to apply automatic fixes.
+
+        Accepts systemd specifiers (see systemd.unit(5)).
       '';
       default = [
-        "$HOME/.vscode-server/bin"
-        "$HOME/.vscode-server-oss/bin"
+        "%h/.vscode-server/bin"
+        "%h/.vscode-server-oss/bin"
       ];
     };
   };
@@ -53,14 +55,14 @@ in
       ExecStart = "${pkgs.writeShellScript "${name}.sh" ''
         set -euo pipefail
         
-        watch_dirs=( ${concatMapStringsSep " " (x: ''"${x}"'') cfg.watchDirs} )
+        watch_dirs=( ''${@:1} )
         for dir in "''${watch_dirs[@]}"; do
           if [[ -d "$dir" ]]; then
             ${pkgs.findutils}/bin/find "$dir" -mindepth 2 -maxdepth 2 -name node -exec ln -sfT ${cfg.nodejsPackage}/bin/node {} \;
             ${pkgs.findutils}/bin/find "$dir" -path '*/vscode-ripgrep/bin/rg'    -exec ln -sfT ${cfg.ripgrepPackage}/bin/rg  {} \;
           fi
         done
-      ''}";
+      ''} ${concatMapStringsSep " " (x: lib.escapeShellArg x) cfg.watchDirs}";
     };
   };
 }
