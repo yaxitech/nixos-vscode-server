@@ -40,14 +40,15 @@ in
   };
 
   config = moduleConfig rec {
+    inherit lib;
     name = svcName;
     pathConfig = {
-      Description = "Watch for changes in directories created by the VS Code remote SSH extension";
+      description = "Watch for changes in directories created by the VS Code remote SSH extension";
       PathChanged = cfg.watchDirs;
       Unit = "${name}.service";
     };
     serviceConfig = {
-      Description = "Fix binaries uploaded by the VS Code server remote SSH extension";
+      description = "Fix binaries uploaded by the VS Code server remote SSH extension";
       Type = "oneshot";
       ExecStart = "${pkgs.writeShellScript "${name}.sh" ''
         set -euo pipefail

@@ -1,5 +1,5 @@
 import ./common.nix (
-  { name, serviceConfig, pathConfig }:
+  { name, serviceConfig, pathConfig, ... }:
   {
     systemd.user.services.${name} = {
       inherit serviceConfig;
