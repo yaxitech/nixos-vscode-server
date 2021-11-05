@@ -58,6 +58,7 @@ in
         watch_dirs=( ''${@:1} )
         for dir in "''${watch_dirs[@]}"; do
           if [[ -d "$dir" ]]; then
+            echo "Fixing $dir"
             ${pkgs.findutils}/bin/find "$dir" -mindepth 2 -maxdepth 2 -name node -exec ln -sfT ${cfg.nodejsPackage}/bin/node {} \;
             ${pkgs.findutils}/bin/find "$dir" -path '*/vscode-ripgrep/bin/rg'    -exec ln -sfT ${cfg.ripgrepPackage}/bin/rg  {} \;
           fi
