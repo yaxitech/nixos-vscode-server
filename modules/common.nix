@@ -46,7 +46,7 @@ in
     name = svcName;
     pathConfig = {
       description = "Watch for changes in directories created by the VS Code remote SSH extension";
-      PathChanged = cfg.watchDirs;
+      PathExistsGlob = map (x: "${x}/*/node") cfg.watchDirs;
       Unit = "${name}.service";
     };
     serviceConfig = {
