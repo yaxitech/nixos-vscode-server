@@ -52,7 +52,7 @@ in
       ExecStart = "${pkgs.writeShellScript "${name}.sh" ''
         set -euo pipefail
         
-        watch_dirs=( ${concatMapStringsSep " " (x: escapeShellArg x) cfg.watchDirs} )
+        watch_dirs=( ${concatMapStringsSep " " (x: ''"${x}"'') cfg.watchDirs} )
         for dir in "''${watch_dirs[@]}"; do
           if [[ -d "$dir" ]]; then
             ${pkgs.findutils}/bin/find "$dir" -mindepth 2 -maxdepth 2 -name node -exec ln -sfT ${cfg.nodejsPackage}/bin/node {} \;
