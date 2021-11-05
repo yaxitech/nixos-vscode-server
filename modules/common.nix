@@ -46,7 +46,7 @@ in
     name = svcName;
     pathConfig = {
       description = "Watch for changes in directories created by the VS Code remote SSH extension";
-      PathChanged = cfg.watchDirs;
+      PathExistsGlob = map (x: "${x}/*/LICENSE") cfg.watchDirs;
       Unit = "${name}.service";
     };
     serviceConfig = {
@@ -67,6 +67,9 @@ in
               -exec ${pkgs.coreutils}/bin/ln -sfT ${cfg.nodejsPackage}/bin/node {} \; | ${pkgs.gnugrep}/bin/grep '^'
             ${pkgs.findutils}/bin/find "$dir" -path '*/vscode-ripgrep/bin/rg'    -printf " - %p\n" \
               -exec ${pkgs.coreutils}/bin/ln -sfT ${cfg.ripgrepPackage}/bin/rg  {} \; | ${pkgs.gnugrep}/bin/grep '^'
+
+            ${pkgs.coreutils}/bin/rm "$dir"/*/LICENSE
+            echo "Succesfully fixed $dir."
           fi
         done
       ''} ${concatMapStringsSep " " (x: lib.escapeShellArg x) cfg.watchDirs}";
