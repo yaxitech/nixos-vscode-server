@@ -7,7 +7,7 @@ let
 in
 {
   options.services.${svcName} = {
-    enable = mkEnableOption "automatic fixups for the VS Code's remote SSH service";
+    enable = mkEnableOption "automatic fixups for the VS Code remote SSH service";
 
     nodejsPackage = mkOption {
       type = types.package;
@@ -46,21 +46,27 @@ in
     name = svcName;
     pathConfig = {
       description = "Watch for changes in directories created by the VS Code remote SSH extension";
-      PathExistsGlob = map (x: "${x}/*/node") cfg.watchDirs;
+      PathChanged = cfg.watchDirs;
       Unit = "${name}.service";
     };
     serviceConfig = {
+      # This service keeps restarting until it replaced all the necessary binaries.
       description = "Fix binaries uploaded by the VS Code server remote SSH extension";
       Type = "oneshot";
+      Restart = "on-failure";
+      RestartSec = "500ms";
+      StartLimitIntervalSec = 0; # disable
       ExecStart = "${pkgs.writeShellScript "${name}.sh" ''
         set -euo pipefail
-        
+
         watch_dirs=( ''${@:1} )
         for dir in "''${watch_dirs[@]}"; do
           if [[ -d "$dir" ]]; then
-            echo "Fixing $dir"
-            ${pkgs.findutils}/bin/find "$dir" -mindepth 2 -maxdepth 2 -name node -exec ${pkgs.coreutils}/bin/ln -sfT ${cfg.nodejsPackage}/bin/node {} \;
-            ${pkgs.findutils}/bin/find "$dir" -path '*/vscode-ripgrep/bin/rg'    -exec ${pkgs.coreutils}/bin/ln -sfT ${cfg.ripgrepPackage}/bin/rg  {} \;
+            echo "Fixing $dir:"
+            ${pkgs.findutils}/bin/find "$dir" -mindepth 2 -maxdepth 2 -name node -printf " - %p\n" \
+              -exec ${pkgs.coreutils}/bin/ln -sfT ${cfg.nodejsPackage}/bin/node {} \; | ${pkgs.gnugrep}/bin/grep '^'
+            ${pkgs.findutils}/bin/find "$dir" -path '*/vscode-ripgrep/bin/rg'    -printf " - %p\n" \
+              -exec ${pkgs.coreutils}/bin/ln -sfT ${cfg.ripgrepPackage}/bin/rg  {} \; | ${pkgs.gnugrep}/bin/grep '^'
           fi
         done
       ''} ${concatMapStringsSep " " (x: lib.escapeShellArg x) cfg.watchDirs}";
