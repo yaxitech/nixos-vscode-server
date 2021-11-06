@@ -34,10 +34,7 @@ in
 
         Accepts systemd specifiers (see systemd.unit(5)).
       '';
-      default = [
-        "%h/.vscode-server/bin"
-        "%h/.vscode-server-oss/bin"
-      ];
+      default = [ "%h/.vscode-server/bin" ];
     };
   };
 
