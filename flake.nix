@@ -73,7 +73,7 @@
 
             machine = {
               imports = [
-                self.nixosModules."${name}-nixos"
+                self.nixosModules.system
               ];
 
               services.vscode-server-fixup.enable = true;
@@ -101,7 +101,7 @@
                 home-manager.useGlobalPkgs = true;
                 home-manager.useUserPackages = true;
                 home-manager.sharedModules = [
-                  self.nixosModules."${name}-home"
+                  self.nixosModules.home
                 ];
                 home-manager.users.root = { ... }: {
                   services.vscode-server-fixup.enable = true;
@@ -126,8 +126,10 @@
       # SYSTEM-INDEPENDENT OUTPUTS
       #
       {
-        nixosModules."${name}-nixos" = import ./modules/nixos.nix;
-        nixosModules."${name}-home" = import ./modules/home.nix;
+        nixosModules = {
+          system = import ./modules/nixos.nix;
+          home = import ./modules/home.nix;
+        };
       }
     ];
 }
