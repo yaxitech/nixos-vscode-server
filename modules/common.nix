@@ -44,13 +44,18 @@ in
   config = moduleConfig rec {
     inherit lib;
     name = svcName;
+    # Create a systemd path unit that watches for the existence of the `LICENSE` file that
+    # gets created when unpacking the VS Code server. As soon as the file exists, it starts
+    # the service below. To prevent the path unit from restarting the service indefinitely, 
+    # the service has to delete the `LICENSE` file, i.e., the the `LICENSE` file indicates
+    # if a profile has been fixed already.
     pathConfig = {
       description = "Watch for changes in directories created by the VS Code remote SSH extension";
       PathExistsGlob = map (x: "${x}/*/LICENSE") cfg.watchDirs;
       Unit = "${name}.service";
     };
+    # Systemd service which fixes VS Code server binaries. 
     serviceConfig = {
-      # This service keeps restarting until it replaced all the necessary binaries.
       description = "Fix binaries uploaded by the VS Code server remote SSH extension";
       Type = "oneshot";
       Restart = "on-failure";
